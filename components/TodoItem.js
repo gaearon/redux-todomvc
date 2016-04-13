@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import TodoTextInput from './TodoTextInput'
 import { PureRenderMixin } from 'pure-render-mixin'
-import { createSelector } from 'reselect'
 import { connect } from 'react-redux'
 
 class TodoItem extends Component {
@@ -77,22 +76,15 @@ TodoItem.propTypes = {
   completeTodo: PropTypes.func.isRequired
 }
 
-const relatedTodoSelectorFactory = () => createSelector(
-  [
-    state => state.todos,
-    (_, ownProps) => ownProps.todo.other
-  ],
-  (todos, otherId) => ({ other: otherId === null ? null : todos[otherId] })
-)
-
-const makeMapStateToProps = () => relatedTodoSelectorFactory();
+function mapStateToProps(state, ownProps) {
+  const otherId = ownProps.todo.other
+  return {
+    other: otherId ? state.todos[ownProps.todo.other] : null
+  }
+}
 
 const ConnectedTodoItem = connect(
-  makeMapStateToProps
+  mapStateToProps
 )(TodoItem)
-
-// MWE: export TodoItem for the plain scenario,
-// export ConnectedTodoItem for the scenario with 1 selector
-// export default TodoItem
 
 export default ConnectedTodoItem
